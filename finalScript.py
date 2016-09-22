@@ -35,7 +35,9 @@ def getID():
 	print (emailID)
 	return id_head[0].get("value") , id_domain[0].getText() ,emailID
 
-name ,domain ,email = getID() 
+email = sys.argv[1]
+[name, domain] = email.split('@')
+# name ,domain ,email = sys.argv[1] , sys.argv[2] , sys.argv[3]   
 print (name)
 print (domain)
 print (email)
@@ -55,8 +57,8 @@ def getToken():
 	
 	response = s.get("https://gradbusters.com/signup",headers=headers)
 	responseText = response.text
-	print (responseText)
-	print (response.cookies)
+	#print (responseText)
+	#print (response.cookies)
 	cookies = response.cookies
 	regex = re.escape('<input type="hidden" name="_token" value="')+'(.+?)'+re.escape('">')
 	result = re.findall(re.compile(regex),responseText)
@@ -80,17 +82,17 @@ def getToken():
 		"email":email,
 		"password":"1234567890"
 	}
-	print (name)
-	print (domain)
-	print (email)
+	# print (name)
+	# print (domain)
+	# print (email)
 	response = s.post("https://gradbusters.com/signup",params=params,headers=headers)
-	print (response.text)
+	#print (response.text)
 
 
 
 getToken()
 
-time.sleep(10)
+time.sleep(5)
 
 headers = {
 			"Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
@@ -126,8 +128,47 @@ def getMailContent(link):
 		authLink = link["href"]
 	#emailResponse = s.get(authLink)
 	print (authLink)
+	return authLink
 	
 	
 
 domain = domain.replace('@','')
 getMailLink(name,domain)
+
+logging.basicConfig(level=logging.DEBUG)
+s = requests.Session()
+
+def getVerified(LinkVerify):
+	headers = {
+	"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+	"accept-encoding":"gzip, deflate, sdch, br",
+	"accept-language":"en-US,en;q=0.8",
+	"upgrade-insecure-requests":"1",
+	"user-agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"
+	}
+
+	response = s.get(LinkVerify,headers=headers)
+	responseText = response.text
+	responseCookies = response.cookies
+	print (responseCookies)
+	print (responseCookies["XSRF-TOKEN"])
+
+	headers = {
+			"cache-control":"max-age=0, no-cache",
+			"cache-control":"no-cache",
+			"cf-ray":"2e5c0ada1b242dc7-BOM",
+			"content-encoding":"gzip",
+			"content-type":"text/html; charset=UTF-8",
+			"date":"Wed, 21 Sep 2016 08:10:45 GMT",
+			"server":"cloudflare-nginx",
+			"set-cookie": str(responseCookies),
+			"status":"200",
+			"vary":"Accept-Encoding",
+			"x-mod-pagespeed":"1.11.33.2-0",
+			"x-powered-by":"PHP/5.6.24"
+	}
+
+	response = s.get("https://gradbusters.com/dashboard/",headers=headers)
+	print (response.text)
+
+#getVerified("https://gradbusters.com/verify/nvUuLhzeQ1mBbbf7ru3jH5NDg6khK7")
