@@ -1,9 +1,9 @@
 '''
 Author : Shreyak Upadhyay
 Email : shreyakupadhyay07@gmail.com
-Subject : signup into gradbuster website .
+Subject : signup into SECURED website .
 Description:
-Signup for the gradbuster website to get a authentication mail.
+Signup for the SECURED website to get a authentication mail.
 '''
 import logging
 import requests
@@ -15,25 +15,6 @@ from bs4 import BeautifulSoup
 
 
 
-def getID():
-	headers = {
-			"Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-			"Accept-Encoding":"gzip, deflate, sdch",
-			"Accept-Language":"en-US,en;q=0.8",
-			"Connection":"keep-alive",
-			"Cookie":"__cfduid=ddd0529779bfee54060fedec5750e47f01474318694; _gat=1; _ga=GA1.2.1971555940.1474318696; __atuvc=3%7C38; __atuvs=57e05167d2fb7690002",
-			"Host":"www.fakemailgenerator.com",
-			"Upgrade-Insecure-Requests":"1",
-			"User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"
-}
-	response = requests.get("http://www.fakemailgenerator.com",headers=headers)
-	responseText = response.text
-	soup = BeautifulSoup(responseText,'lxml')
-	id_head = soup.findAll('input',attrs={'id':'home-email'}) # getting head name of the email ID
-	id_domain = soup.findAll('span',attrs={'id':'domain'})   # getting domai of the email ID
-	emailID = id_head[0].get("value") + id_domain[0].getText()
-	print (emailID)
-	return id_head[0].get("value") , id_domain[0].getText() ,emailID
 
 email = sys.argv[1]
 [name, domain] = email.split('@')
@@ -46,7 +27,7 @@ logging.basicConfig(level=logging.DEBUG)
 s = requests.Session()
 
 
-def getToken():
+def sendPost():
 	headers = {
 			"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
 			"accept-encoding":"gzip, deflate, br",
@@ -55,42 +36,41 @@ def getToken():
 			"user-agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"
 	}
 	
-	response = s.get("https://gradbusters.com/signup",headers=headers)
-	responseText = response.text
-	#print (responseText)
-	#print (response.cookies)
-	cookies = response.cookies
-	regex = re.escape('<input type="hidden" name="_token" value="')+'(.+?)'+re.escape('">')
+	signUp_response = s.get(LINK TO SIGN UP PAGE,headers=headers)
+	responseText = signUp_response.text
+
+	regex = "USE REGEX TO FIND A PARAMETER REQUIRED FOR THE POST REQUEST FOR SIGN UP"
 	result = re.findall(re.compile(regex),responseText)
-	print (result[0])
 
 	token = result[0]
+
 	headers = {
 			"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
 			"accept-encoding":"gzip, deflate, br",
 			"accept-language":"en-US,en;q=0.8",
 			"upgrade-insecure-requests":"1",
 			"user-agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36",
-			"cookies":str(cookies),
-			"origin":"https://gradbusters.com",
-			"referer":"https://gradbusters.com/signup"
+			"cookies":str(signUp_response.cookies),
+			"origin":ORIGIN TO THE WEBSITE,
+			"referer": REFERER TO THE REQUEST
 	}
 
 	params = {
 		"_token":token,
 		"name":name,
 		"email":email,
-		"password":"1234567890"
+		"password":password
 	}
-	# print (name)
-	# print (domain)
-	# print (email)
-	response = s.post("https://gradbusters.com/signup",params=params,headers=headers)
-	#print (response.text)
+	
+	response = s.post(SEND THE POST REQUEST CONTAINING ALL PARAMETERS,params=params,headers=headers)
 
 
 
-getToken()
+sendPost()
+
+"""
+WAIT SO THAT CONFIRMATION MAIL IS SENT TO THE FAKE MAIL GENERATOR SERVER. HERE I AM USING fakemailgenerator.com WEBSITE.
+"""
 
 time.sleep(5)
 
@@ -105,6 +85,10 @@ headers = {
 			"User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"
 }
 
+"""
+THIS FUNCTION RETURNS THE LINK TO THE CONFIRMATION MAIL AS HERE YOU WILL BE GETTING THE LINK TO ALL THE MAILS IN YOUR INBOX AND
+MOST PROBABLY THE FIRST ONE CONTAINS THE CONFIRMATION MAIL.
+"""
 
 def getMailLink(id_head,id_domain):
 	response = requests.get("http://www.fakemailgenerator.com/inbox/"+id_domain+"/"+id_head,headers=headers)
@@ -117,6 +101,9 @@ def getMailLink(id_head,id_domain):
 				emailLink = link["href"].replace("/inbox/","/email/")
 				getMailContent(emailLink)
 
+"""
+THIS FUNCTION RETURNS THE LINK OF THE VERIFICATION.
+"""
 
 def getMailContent(link):
 	emailResponse = requests.get("http://www.fakemailgenerator.com"+link,headers=headers)
@@ -133,7 +120,11 @@ def getMailContent(link):
 	
 
 domain = domain.replace('@','')
-getMailLink(name,domain)
+verificationLink = getMailLink(name,domain)
+
+"""
+THIS FUNCTION FINALLY ALLOWS TO GET VERIFIED AND LOGIN INTO THE WEBSITE YOU WANT USING THE SCRIPT AND WITH A FAKE MAIL.
+"""
 
 logging.basicConfig(level=logging.DEBUG)
 s = requests.Session()
@@ -168,7 +159,7 @@ def getVerified(LinkVerify):
 			"x-powered-by":"PHP/5.6.24"
 	}
 
-	response = s.get("https://gradbusters.com/dashboard/",headers=headers)
+	response = s.get(LINK TO THE GET REQUEST WHICH OCCURS AFTER GIVING THE VERIFICATION LINK,headers=headers)
 	print (response.text)
 
-#getVerified("https://gradbusters.com/verify/nvUuLhzeQ1mBbbf7ru3jH5NDg6khK7")
+getVerified(verificationLink)
