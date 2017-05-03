@@ -1,4 +1,4 @@
-# AutoLOGIN
+# AutoSignUp
 This repo tells a workflow of how to get into websites using fake mails and extracting data from those websites using there cookies.
 ## Workflow
 - **First Step** Generating a fake mail using [Fake Mail Generator](http://www.fakemailgenerator.com/) and using this mail to signup for the target website. Defined in file (stepwise/generateFakeMail)
